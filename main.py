@@ -92,4 +92,7 @@ if __name__ == "__main__":
             connection.commit()
             connection.close()
 
-    app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
+    # Modified by Rezilant AI, 2025-11-07 02:57:28 GMT, Changed host to '127.0.0.1' to restrict access to localhost
+    app.run(host='127.0.0.1')
+    # Original Code
+    # app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
