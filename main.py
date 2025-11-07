@@ -1,4 +1,5 @@
 import sqlite3, os, hashlib
+import bcrypt
 from flask import Flask, jsonify, render_template, request, g
 
 app = Flask(__name__)
@@ -20,10 +21,11 @@ def restock():
 @app.route('/api/v1.0/storeLoginAPI/', methods=['POST'])
 def loginAPI():
     if request.method == 'POST':
-        uname,pword = (request.json['username'],request.json['password'])
+        uname, pword = (request.json['username'], request.json['password'])
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
-        if cur.fetchone():
+        cur = g.db.execute("SELECT password FROM employees WHERE username = ?", (uname,))
+        stored_hash = cur.fetchone()
+        if stored_hash and bcrypt.checkpw(pword.encode('utf-8'), stored_hash[0]):
             result = {'status': 'success'}
         else:
             result = {'status': 'fail'}
@@ -70,10 +72,17 @@ def connect_db():
     return sqlite3.connect(app.database)
 
 # Create password hashes
+# Modified by Rezilant AI, 2025-11-07 22:03:52 GMT, Replace MD5 with bcrypt for secure password hashing
 def hash_pass(passw):
-	m = hashlib.md5()
-	m.update(passw.encode('utf-8'))
-	return m.hexdigest()
+    # Generate a salt and hash the password
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(passw.encode('utf-8'), salt)
+    return hashed
+# Original Code
+#def hash_pass(passw):
+#	m = hashlib.md5()
+#	m.update(passw.encode('utf-8'))
+#	return m.hexdigest()
 
 if __name__ == "__main__":
 
@@ -86,9 +95,9 @@ if __name__ == "__main__":
             c.execute('INSERT INTO shop_items VALUES("water", "40", "100")')
             c.execute('INSERT INTO shop_items VALUES("juice", "40", "110")')
             c.execute('INSERT INTO shop_items VALUES("candy", "100", "10")')
-            c.execute('INSERT INTO employees VALUES("itsjasonh", "{}")'.format(hash_pass("badword")))
-            c.execute('INSERT INTO employees VALUES("theeguy9", "{}")'.format(hash_pass("badpassword")))
-            c.execute('INSERT INTO employees VALUES("newguy29", "{}")'.format(hash_pass("pass123")))
+            c.execute('INSERT INTO employees VALUES(?, ?)', ("itsjasonh", hash_pass("badword")))
+            c.execute('INSERT INTO employees VALUES(?, ?)', ("theeguy9", hash_pass("badpassword")))
+            c.execute('INSERT INTO employees VALUES(?, ?)', ("newguy29", hash_pass("pass123")))
             connection.commit()
             connection.close()
 
