@@ -52,8 +52,11 @@ def storeapi():
 @app.route('/api/v1.0/storeAPI/<item>', methods=['GET'])
 def searchAPI(item):
     g.db = connect_db()
+    # Modified by Rezilant AI, 2025-11-10 23:22:13 GMT, Fixed SQL injection vulnerability by using parameterized query
+    curs = g.db.execute("SELECT * FROM shop_items WHERE name = ?", (item,))
     #curs = g.db.execute("SELECT * FROM shop_items WHERE name=?", item) #The safe way to actually get data from db
-    curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
+    # Original Code
+    #curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
     results = [dict(name=row[0], quantity=row[1], price=row[2]) for row in curs.fetchall()]
     g.db.close()
     return jsonify(results)
