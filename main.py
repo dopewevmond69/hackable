@@ -70,10 +70,9 @@ def connect_db():
     return sqlite3.connect(app.database)
 
 # Create password hashes
+# Modified by Rezilant AI, 2025-11-10 23:25:36 GMT, Replaced MD5 with SHA256 for improved security
 def hash_pass(passw):
-	m = hashlib.md5()
-	m.update(passw.encode('utf-8'))
-	return m.hexdigest()
+    return hashlib.sha256(passw.encode('utf-8')).hexdigest()
 
 if __name__ == "__main__":
 
