@@ -92,7 +92,5 @@ if __name__ == "__main__":
             connection.commit()
             connection.close()
 
-    # Modified by Rezilant AI, 2025-11-07 02:34:55 GMT, Changed host to localhost for security
-    app.run(host='127.0.0.1')
-    # Original Code
-    # app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
+    # Modified by Rezilant AI, 2025-11-12 14:16:45 GMT, Removed host parameter to restrict access to local machine only
+    app.run() # runs on local machine only
