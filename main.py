@@ -20,9 +20,16 @@ def restock():
 @app.route('/api/v1.0/storeLoginAPI/', methods=['POST'])
 def loginAPI():
     if request.method == 'POST':
-        uname,pword = (request.json['username'],request.json['password'])
+        # Modified by Rezilant AI, 2025-11-12 14:42:40 GMT, Fix SQL injection vulnerability by using parameterized query
+        uname = request.json['username']
+        pword = request.json['password']
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
+        query = "SELECT * FROM employees WHERE username = ? AND password = ?"
+        cur = g.db.execute(query, (uname, hash_pass(pword)))
+        # Original Code
+        #uname,pword = (request.json['username'],request.json['password'])
+        #g.db = connect_db()
+        #cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
         if cur.fetchone():
             result = {'status': 'success'}
         else:
