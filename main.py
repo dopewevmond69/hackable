@@ -22,7 +22,10 @@ def loginAPI():
     if request.method == 'POST':
         uname,pword = (request.json['username'],request.json['password'])
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
+        # Modified by Rezilant AI, 2025-11-12 16:32:50 GMT, Fixed SQL injection vulnerability using parameterized query
+        cur = g.db.execute("SELECT * FROM employees WHERE username = ? AND password = ?", (uname, hash_pass(pword)))
+        # Original Code
+        # cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
         if cur.fetchone():
             result = {'status': 'success'}
         else:
