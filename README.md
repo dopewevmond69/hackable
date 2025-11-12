@@ -1,4 +1,4 @@
-# hackable
+# hackable-dev
 A python flask app that is purposfully vulnerable to SQL injection and XSS attacks
 
 # How to run
