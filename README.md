@@ -1,4 +1,4 @@
-# hackable
+# hackable-staging
 A python flask app that is purposfully vulnerable to SQL injection and XSS attacks
 
 # How to run
