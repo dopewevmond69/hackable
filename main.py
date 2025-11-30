@@ -22,7 +22,10 @@ def loginAPI():
     if request.method == 'POST':
         uname,pword = (request.json['username'],request.json['password'])
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
+        # Modified by Rezilant AI, 2025-11-30 21:40:54 GMT, Fixed SQL injection by using parameterized query
+        cur = g.db.execute("SELECT * FROM employees WHERE username = ? AND password = ?", (uname, hash_pass(pword)))
+        # Original Code
+        # cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
         if cur.fetchone():
             result = {'status': 'success'}
         else:
@@ -52,8 +55,11 @@ def storeapi():
 @app.route('/api/v1.0/storeAPI/<item>', methods=['GET'])
 def searchAPI(item):
     g.db = connect_db()
+    # Modified by Rezilant AI, 2025-11-30 21:40:54 GMT, Fixed SQL injection by using parameterized query
+    curs = g.db.execute("SELECT * FROM shop_items WHERE name = ?", (item,))
     #curs = g.db.execute("SELECT * FROM shop_items WHERE name=?", item) #The safe way to actually get data from db
-    curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
+    # Original Code
+    # curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
     results = [dict(name=row[0], quantity=row[1], price=row[2]) for row in curs.fetchall()]
     g.db.close()
     return jsonify(results)
@@ -71,7 +77,11 @@ def connect_db():
 
 # Create password hashes
 def hash_pass(passw):
-	m = hashlib.md5()
+	# Modified by Rezilant AI, 2025-11-30 21:40:54 GMT, Replaced insecure MD5 with SHA256
+	import hashlib
+	m = hashlib.sha256()
+	# Original Code
+	# m = hashlib.md5()
 	m.update(passw.encode('utf-8'))
 	return m.hexdigest()
 
@@ -92,4 +102,7 @@ if __name__ == "__main__":
             connection.commit()
             connection.close()
 
-    app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
+    # Modified by Rezilant AI, 2025-11-30 21:40:54 GMT, Changed host to localhost to prevent public exposure
+    app.run(host='127.0.0.1') # runs on machine ip address to make it visible on netowrk
+    # Original Code
+    # app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
