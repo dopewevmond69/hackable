@@ -22,7 +22,10 @@ def loginAPI():
     if request.method == 'POST':
         uname,pword = (request.json['username'],request.json['password'])
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
+        # Modified by Rezilant AI, 2025-12-02 14:48:33 GMT, Fixed SQL injection by using parameterized query instead of string formatting
+        cur = g.db.execute("SELECT * FROM employees WHERE username = ? AND password = ?", (uname, hash_pass(pword)))
+        # Original Code
+        # cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
         if cur.fetchone():
             result = {'status': 'success'}
         else:
@@ -52,8 +55,10 @@ def storeapi():
 @app.route('/api/v1.0/storeAPI/<item>', methods=['GET'])
 def searchAPI(item):
     g.db = connect_db()
-    #curs = g.db.execute("SELECT * FROM shop_items WHERE name=?", item) #The safe way to actually get data from db
-    curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
+    # Modified by Rezilant AI, 2025-12-02 14:48:33 GMT, Fixed SQL injection by using parameterized query with placeholder
+    curs = g.db.execute("SELECT * FROM shop_items WHERE name = ?", (item,))
+    # Original Code
+    # curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
     results = [dict(name=row[0], quantity=row[1], price=row[2]) for row in curs.fetchall()]
     g.db.close()
     return jsonify(results)
