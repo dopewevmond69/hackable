@@ -53,7 +53,10 @@ def storeapi():
 def searchAPI(item):
     g.db = connect_db()
     #curs = g.db.execute("SELECT * FROM shop_items WHERE name=?", item) #The safe way to actually get data from db
-    curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
+    # Modified by Rezilant AI, 2025-12-04 07:03:25 GMT, Replace string formatting with parameterized query to prevent SQL injection
+    curs = g.db.execute("SELECT * FROM shop_items WHERE name = ?", (item,))
+    # Original Code
+    #curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
     results = [dict(name=row[0], quantity=row[1], price=row[2]) for row in curs.fetchall()]
     g.db.close()
     return jsonify(results)
