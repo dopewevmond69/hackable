@@ -22,7 +22,10 @@ def loginAPI():
     if request.method == 'POST':
         uname,pword = (request.json['username'],request.json['password'])
         g.db = connect_db()
-        cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
+        # Modified by Rezilant AI, 2025-12-07 16:51:47 GMT, Replace string formatting with parameterized query to prevent SQL injection
+        cur = g.db.execute("SELECT * FROM employees WHERE username = ? AND password = ?", (uname, hash_pass(pword)))
+        # Original Code
+        # cur = g.db.execute("SELECT * FROM employees WHERE username = '%s' AND password = '%s'" %(uname, hash_pass(pword)))
         if cur.fetchone():
             result = {'status': 'success'}
         else:
@@ -53,7 +56,10 @@ def storeapi():
 def searchAPI(item):
     g.db = connect_db()
     #curs = g.db.execute("SELECT * FROM shop_items WHERE name=?", item) #The safe way to actually get data from db
-    curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
+    # Modified by Rezilant AI, 2025-12-07 16:51:47 GMT, Replace string formatting with parameterized query to prevent SQL injection
+    curs = g.db.execute("SELECT * FROM shop_items WHERE name = ?", (item,))
+    # Original Code
+    # curs = g.db.execute("SELECT * FROM shop_items WHERE name = '%s'" %item)
     results = [dict(name=row[0], quantity=row[1], price=row[2]) for row in curs.fetchall()]
     g.db.close()
     return jsonify(results)
@@ -71,9 +77,12 @@ def connect_db():
 
 # Create password hashes
 def hash_pass(passw):
-	m = hashlib.md5()
-	m.update(passw.encode('utf-8'))
-	return m.hexdigest()
+    # Modified by Rezilant AI, 2025-12-07 16:51:47 GMT, Replace MD5 with SHA-256 for secure password hashing
+    m = hashlib.sha256()
+    # Original Code
+    # m = hashlib.md5()
+    m.update(passw.encode('utf-8'))
+    return m.hexdigest()
 
 if __name__ == "__main__":
 
@@ -92,7 +101,7 @@ if __name__ == "__main__":
             connection.commit()
             connection.close()
 
-    # Modified by Rezilant AI, 2025-12-07 16:43:50 GMT, Changed host from 0.0.0.0 to 127.0.0.1 to prevent public exposure
-    app.run(host='127.0.0.1', port=5000)  # Binds to localhost only for security
+    # Modified by Rezilant AI, 2025-12-07 16:51:47 GMT, Changed host from 0.0.0.0 to 127.0.0.1 to prevent public exposure
+    app.run(host='127.0.0.1', port=5000)
     # Original Code
     # app.run(host='0.0.0.0') # runs on machine ip address to make it visible on netowrk
